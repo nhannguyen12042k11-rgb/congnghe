@@ -1,1 +1,558 @@
-<!DOCTYPE html><html lang="vi"><head>    <meta charset="UTF-8">    <meta name="viewport" content="width=device-width, initial-scale=1.0">    <title>Trắc Nghiệm Công Nghệ 9 | Optimized by Dex</title>    <style>        /* Toàn bộ hệ thống dùng font đen như yêu cầu */        :root {            --text-color: #000000;            --glass-bg: rgba(255, 255, 255, 0.7);            --glass-border: rgba(255, 255, 255, 0.5);            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);            --primary: #2563eb;            --success: #16a34a;            --danger: #dc2626;        }        * {            box-sizing: border-box;            margin: 0;            padding: 0;            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;            color: var(--text-color);            transition: all 0.3s ease;        }        body {            min-height: 100vh;            display: flex;            justify-content: center;            align-items: center;            overflow-x: hidden;            position: relative;            background-size: cover;            background-attachment: fixed;        }        /* Gradient Themes */        body.light-theme {            background: linear-gradient(135deg, #00f2fe 0%, #fee140 100%);        }        body.dark-theme {            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);        }        /* 2D Grid Tween Animation */        .grid-bg {            position: fixed;            top: -50%;            left: -50%;            width: 200%;            height: 200%;            background-image:                 linear-gradient(rgba(0,0,0,0.08) 1px, transparent 1px),                linear-gradient(90deg, rgba(0,0,0,0.08) 1px, transparent 1px);            background-size: 40px 40px;            animation: gridMove 15s linear infinite;            z-index: -1;            will-change: transform;        }                body.dark-theme .grid-bg {            background-image:                 linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),                linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px);        }        @keyframes gridMove {            0% { transform: translate(0, 0); }            100% { transform: translate(40px, 40px); }        }        /* Glassmorphism Panel */        .glass-panel {            background: var(--glass-bg);            backdrop-filter: blur(16px);            -webkit-backdrop-filter: blur(16px);            border: 1px solid var(--glass-border);            box-shadow: var(--glass-shadow);            border-radius: 24px;            padding: 30px;            width: 95%;            position: relative;            display: flex;            flex-direction: column;            max-height: 95vh;            overflow-y: auto;        }        /* Window Sizes */        .size-normal { max-width: 800px; }        .size-large { max-width: 1200px; }        .size-fullscreen {             max-width: 100%;             width: 100%;             height: 100vh;             max-height: 100vh;             border-radius: 0;             border: none;        }        /* Theme Toggle */        .theme-toggle {            position: absolute;            top: 20px;            right: 20px;            background: var(--glass-bg);            border: 1px solid #000;            padding: 8px 16px;            border-radius: 20px;            cursor: pointer;            font-weight: bold;            z-index: 10;        }        .theme-toggle:hover { background: rgba(0,0,0,0.1); }        /* Screens */        .screen { display: none; width: 100%; }        .screen.active { display: block; animation: fadeIn 0.5s ease; }        @keyframes fadeIn {            from { opacity: 0; transform: translateY(10px); }            to { opacity: 1; transform: translateY(0); }        }        /* Start Screen */        .setup-section {            margin-bottom: 20px;            padding: 15px;            background: rgba(255,255,255,0.5);            border-radius: 12px;            border: 1px solid rgba(0,0,0,0.1);        }        h1, h2 { text-align: center; margin-bottom: 20px; font-weight: 800; }                .radio-group { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; }        .radio-group label {            display: flex; align-items: center; gap: 5px; cursor: pointer; font-weight: 600;        }        .btn {            background: transparent;            border: 2px solid #000;            padding: 12px 24px;            border-radius: 12px;            font-size: 16px;            font-weight: bold;            cursor: pointer;            display: block;            margin: 20px auto 0;        }        .btn:hover { background: #000; color: #fff; }        .btn-start { font-size: 20px; padding: 15px 40px; }        /* Quiz Screen */        .header-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-weight: bold;}                .progress-container {            width: 100%; height: 10px; background: rgba(0,0,0,0.1);            border-radius: 5px; margin-bottom: 20px; overflow: hidden;        }        .progress-bar {            height: 100%; background: #000; width: 0%; transition: width 0.4s ease;        }        .question-box { font-size: 18px; font-weight: 600; margin-bottom: 20px; }                .options { display: flex; flex-direction: column; gap: 12px; }        .option {            background: rgba(255,255,255,0.6);            border: 2px solid rgba(0,0,0,0.2);            padding: 15px;            border-radius: 12px;            cursor: pointer;            font-weight: 500;            display: flex;            align-items: center;        }        .option:hover:not(.disabled) { border-color: #000; background: rgba(0,0,0,0.05); }        .option.selected { border-color: #000; background: rgba(0,0,0,0.1); font-weight: bold; }                /* Review states */        .option.correct { border-color: var(--success); background: rgba(22, 163, 74, 0.2); }        .option.wrong { border-color: var(--danger); background: rgba(220, 38, 38, 0.2); }        .option.disabled { cursor: not-allowed; }        .nav-buttons { display: flex; justify-content: space-between; margin-top: 25px; }        /* Result Screen */        .result-container { text-align: center; }        .circular-progress {            position: relative;            height: 200px; width: 200px;            border-radius: 50%;            background: conic-gradient(#000 0deg, rgba(0,0,0,0.1) 0deg);            display: flex; align-items: center; justify-content: center;            margin: 0 auto 30px;        }        .circular-progress::before {            content: "";            position: absolute;            height: 160px; width: 160px;            border-radius: 50%;            background: #fff;            opacity: 0.8;        }        .progress-value { position: relative; font-size: 40px; font-weight: 800; }        /* Notification Popup */        .popup {            position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%);            background: rgba(255,255,255,0.9);            backdrop-filter: blur(10px); border: 2px solid #000;            padding: 15px 40px 15px 20px; border-radius: 12px;            box-shadow: 0 10px 30px rgba(0,0,0,0.2);            display: flex; align-items: center; gap: 10px;            z-index: 1000; transition: bottom 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);            font-weight: bold;        }        .popup.show { bottom: 30px; }        .popup .close-btn {            position: absolute; top: 5px; right: 10px;            cursor: pointer; font-size: 16px; font-weight: bold;        }        .icon-check { color: var(--success); font-size: 20px; }        .icon-cross { color: var(--danger); font-size: 20px; }        .footer-sig { text-align: center; margin-top: 20px; font-size: 12px; font-weight: 600; opacity: 0.7; }    </style></head><body class="light-theme">    <div class="grid-bg"></div>    <button class="theme-toggle" onclick="toggleTheme()">Sáng / Tối</button>    <div class="glass-panel size-normal" id="mainPanel">                <div id="startScreen" class="screen active">            <h1>HỆ THỐNG TRẮC NGHIỆM</h1>            <h2>CÔNG NGHỆ 9 - HK2</h2>                        <div class="setup-section">                <h3 style="margin-bottom: 10px; text-align: center;">Tùy chỉnh Giao diện</h3>                <div class="radio-group">                    <label><input type="radio" name="winSize" value="size-normal" checked> Normal</label>                    <label><input type="radio" name="winSize" value="size-large"> Large</label>                    <label><input type="radio" name="winSize" value="size-fullscreen"> Full-Screen</label>                </div>            </div>                        <div class="setup-section">                <h3 style="margin-bottom: 10px; text-align: center;">Tùy chọn Bài làm</h3>                <div class="radio-group">                    <label><input type="checkbox" id="shuffleCheck" checked> Đảo vị trí câu hỏi</label>                </div>            </div>            <button class="btn btn-start" onclick="startSystem()">BẮT ĐẦU (15 Phút)</button>            <div class="footer-sig">Vnix Hub by Dexeloper</div>        </div>        <div id="quizScreen" class="screen">            <div class="header-info">                <span id="questionCounter">Câu: 1/28</span>                <span id="timer">Thời gian: 15:00</span>            </div>            <div class="progress-container">                <div class="progress-bar" id="progressBar"></div>            </div>            <div class="question-box" id="questionText">Loading...</div>            <div class="options" id="optionsContainer"></div>                        <div class="nav-buttons">                <button class="btn" id="btnPrev" onclick="navQuestion(-1)">Quay lại</button>                <button class="btn" id="btnNext" onclick="navQuestion(1)">Tiếp theo</button>                <button class="btn" id="btnSubmit" onclick="submitQuiz()" style="display:none; background: #000; color: #fff;">Nộp Bài</button>            </div>            <div id="reviewActions" style="display:none; margin-top: 15px; text-align: center;">                <button class="btn" onclick="resetSystem()">Làm lại bài</button>            </div>            <div class="footer-sig">Optimized by Dex</div>        </div>        <div id="resultScreen" class="screen">            <h1>KẾT QUẢ BÀI LÀM</h1>            <div class="result-container">                <div class="circular-progress" id="circularProgress">                    <span class="progress-value" id="scoreText">0%</span>                </div>                <h2 id="correctCountText" style="margin-bottom: 20px;">Đúng: 0/28</h2>                <div style="display: flex; gap: 15px; justify-content: center;">                    <button class="btn" onclick="startReview()">Review Bài Làm</button>                    <button class="btn" onclick="resetSystem()">Làm lại bài</button>                </div>            </div>            <div class="footer-sig">Vnix Hub by Dexeloper</div>        </div>    </div>    <div class="popup" id="reviewPopup">        <span class="close-btn" onclick="closePopup()">x</span>        <span id="popupIcon"></span>        <span id="popupText">Nội dung thông báo</span>    </div>    <script>        const rawData = [            { q: "Câu 1: Tên gọi khác của thịt thăn là", o: ["A. Thịt nạc vai.", "B. Thịt ba rọi.", "C. Thịt ba chỉ.", "D. Thịt nạc thăn."], a: 3 },            { q: "Câu 2: Chất khoáng Iodine thường có nhiều trong thực phẩm:", o: ["A. Thịt bò, rau mồng tơi", "B. Rau dền, tôm.", "C. Cua, ghẹ, nghêu, sò, hến.", "D. Rau bắp cải, cá mực."], a: 2 },            { q: "Câu 3: Công việc chính của đầu bếp trưởng là", o: ["A. Nhận đơn hàng và phục vụ.", "B. Bảo quản, phân loại thực phẩm.", "C. Lập kế hoạch, phát triển công thức nấu ăn và thực đơn.", "D. Trộn, nghiền, tách thực phẩm."], a: 2 },            { q: "Câu 4: Trang bị bảo hộ cần thiết để đảm bảo an toàn lao động chế biến thực phẩm?", o: ["A. Tạp dề, khẩu trang, mũ đội che tóc,...", "B. Nguyên liệu, khẩu trang, tạp dề,...", "C. Khay làm bánh, nhà bếp, tạp dề,...", "D. Tạp dề, găng tay, bồn rửa,..."], a: 0 },            { q: "Câu 5: Để thực hiện tốt công việc của một thợ chế biến cần phát triển năng lực:", o: ["A. Kĩ năng chế biến các loại thực phẩm.", "B. Kĩ năng vận hành máy móc.", "C. Kĩ năng quản lí đầu bếp.", "D. Kĩ năng giám sát máy."], a: 0 },            { q: "Câu 6: Lưu ý khi sử dụng dụng cụ, thiết bị làm từ nhựa?", o: ["A. Dùng đựng thức ăn đang sôi.", "B. Hạn chế chất tẩy rửa mạnh hoặc vật gây xước.", "C. Đặt gần bếp lửa.", "D. Không cần kiểm tra đồ nhựa."], a: 1 },            { q: "Câu 7: Yêu cầu khi sử dụng dụng cụ sắc nhọn trong nhà bếp:", o: ["A. Không sử dụng dụng cụ bị hư hỏng.", "B. Bố trí hợp lí, thuận tiện, để xa tầm tay trẻ em.", "C. Để gần tầm tay trẻ em.", "D. Để ở những nơi thông thoáng."], a: 1 },            { q: "Câu 8: Lưu ý khi sử dụng và bảo quản thiết bị dùng gas là", o: ["A. Đặt bình gas gần nguồn nhiệt.", "B. Sử dụng trong phòng kín.", "C. Khóa van gas sau khi sử dụng.", "D. Để bình gas nằm ngang."], a: 2 },            { q: "Câu 9: Thành phần nào trong rau xanh giúp cải thiện táo bón?", o: ["A. Lipid", "B. Chất xơ", "C. Protein", "D. Vitamin"], a: 1 },            { q: "Câu 10: 1kg bắp cải 30.000đ. Chi phí mua 0,5kg bắp cải là?", o: ["A. 12.000 đồng.", "B. 15.000 đồng.", "C. 20.000 đồng.", "D. 25.000 đồng."], a: 1 },            { q: "Câu 11: Vai trò của vitamin A đối với cơ thể?", o: ["A. Tham gia quá trình oxy hóa.", "B. Kích thích ăn uống, phát triển thần kinh.", "C. Tăng cường cốt hóa xương.", "D. Phát triển, tái tạo tế bào da, niêm mạc, tăng miễn dịch."], a: 3 },            { q: "Câu 12: Chất khoáng sắt thường có trong thực phẩm nào?", o: ["A. Rau lá màu xanh đậm.", "B. Muối, gia vị.", "C. Các loại thịt, hải sản, lòng đỏ trứng, rau cải.", "D. Gan, thịt động vật bốn chân và trứng."], a: 0 },            { q: "Câu 13: Thiếu Iodine có thể dẫn đến nguy cơ mắc bệnh:", o: ["A. Buồn nôn, tiêu chảy.", "B. Suy giáp - bệnh bướu cổ.", "C. Da đậm màu, đau khớp.", "D. Khát nước, tăng huyết áp."], a: 1 },            { q: "Câu 14: Đặc điểm của thịt lợn tươi ngon?", o: ["A. Màu trắng, săn chắc.", "B. Màu hồng, thịt nhão.", "C. Có màu hồng, săn chắc, da mỏng, không có mùi ôi thiu/kháng sinh.", "D. Màu hồng, săn chắc, da mỏng."], a: 2 },            { q: "Câu 15: Tên gọi khác của thịt ba chỉ là:", o: ["A. Thịt nạc vai.", "B. Thịt thăn.", "C. Thịt ba rọi.", "D. Thịt mông."], a: 2 },            { q: "Câu 16: Nhiệt độ nguy hiểm khiến vi khuẩn phát triển nhanh nhất là:", o: ["A. 0°C đến 37°C.", "B. Dưới 0°C.", "C. Trên 100°C.", "D. 70°C đến 80°C."], a: 0 },            { q: "Câu 17: Một số ngành nghề liên quan đến chế biến thực phẩm là", o: ["A. Thợ chế biến, thợ cơ khí...", "B. Thợ chế biến thực phẩm, thợ vận hành máy, đầu bếp trưởng, người chuẩn bị đồ ăn nhanh...", "C. Thợ chế biến, tiếp viên hàng không...", "D. Thợ chế biến, giáo viên, lập trình viên..."], a: 1 },            { q: "Câu 18: Nội dung không đúng về công việc người chuẩn bị đồ ăn nhanh?", o: ["A. Chuẩn bị món ăn đơn giản.", "B. Rửa, thái, đong trộn.", "C. Sử dụng thiết bị nấu ăn.", "D. Giám sát máy móc giết mổ động vật, cắt thịt..."], a: 3 },            { q: "Câu 19: Tại sao không nên phơi đồ nhựa trực tiếp dưới nắng?", o: ["A. Nhanh bị móp méo.", "B. Nhanh bị giòn, vỡ, gãy.", "C. Không gây tác hại.", "D. Dễ mốc, mọt."], a: 1 },            { q: "Câu 20: Cách sử dụng dụng cụ, thiết bị làm từ gỗ?", o: ["A. Không đun nấu nhiệt độ quá cao.", "B. Hạn chế va đập.", "C. Tránh tiếp xúc trực tiếp với lửa hoặc nguồn nhiệt độ quá cao.", "D. Phơi trực tiếp dưới nắng."], a: 2 },            { q: "Câu 21: Biện pháp phòng tránh ngộ độc do vi sinh vật?", o: ["A. Đeo khẩu trang đi ngủ.", "B. Ăn tiết canh.", "C. Rửa tay bằng xà phòng trước khi chế biến.", "D. Sử dụng thực phẩm hết hạn."], a: 2 },            { q: "Câu 22: Bỏ bữa sáng thiếu thành phần cung cấp năng lượng tức thời nào?", o: ["A. Protein", "B. Lipid", "C. Carbohydrate (Chất bột đường)", "D. Vitamin"], a: 2 },            { q: "Câu 23: 0,5kg bí đỏ giá 10.000đ. Chi phí mua 1kg là?", o: ["A. 15.000 đồng.", "B. 20.000 đồng", "C. 25.000 đồng.", "D. 30.000 đồng"], a: 1 },            { q: "Câu 24: Vai trò của vitamin C đối với cơ thể?", o: ["A. Tái tạo tế bào da.", "B. Kích thích hệ xương.", "C. Phát triển thần kinh.", "D. Chống oxy hóa, kích thích liền sẹo, dự phòng tim mạch."], a: 3 },            { q: "Câu 25: Vitamin A thường có trong thực phẩm nào?", o: ["A. Sữa, gan, lòng đỏ trứng, bơ, phô mai.", "B. Ngũ cốc, rau quả.", "C. Chanh, cam, bưởi...", "D. Hải sản."], a: 0 },            { q: "Câu 26: Thiếu vitamin A nguy cơ mắc bệnh:", o: ["A. Thiếu máu.", "B. Còi xương.", "C. Quáng gà, khô mắt.", "D. Bướu cổ."], a: 2 },            { q: "Câu 27: Đặc điểm gạo tẻ ngon:", o: ["A. Ít rạn nứt.", "B. Màu hơi trắng đục, thân hạt hơi dài, hình bầu dục.", "C. Hạt tròn, trắng đục.", "D. Không nát, thơm."], a: 1 },            { q: "Câu 28: Phòng bệnh còi xương trẻ em cần bổ sung:", o: ["A. Vitamin A", "B. Vitamin C", "C. Vitamin B1", "D. Vitamin D"], a: 3 }        ];        let questions = [];        let userAnswers = [];        let currentIdx = 0;        let timerInt;        let timeLeft = 900; // 15 mins        let isReviewMode = false;        let popupTimeout;        function toggleTheme() {            const body = document.body;            if (body.classList.contains('light-theme')) {                body.classList.replace('light-theme', 'dark-theme');            } else {                body.classList.replace('dark-theme', 'light-theme');            }        }        function switchScreen(screenId) {            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));            document.getElementById(screenId).classList.add('active');        }        function startSystem() {            // Setup Window Size            const size = document.querySelector('input[name="winSize"]:checked').value;            const panel = document.getElementById('mainPanel');            panel.className = `glass-panel ${size}`;            // Prepare Data            questions = JSON.parse(JSON.stringify(rawData));            if (document.getElementById('shuffleCheck').checked) {                questions.sort(() => Math.random() - 0.5);            }            userAnswers = new Array(questions.length).fill(null);            currentIdx = 0;            timeLeft = 900;            isReviewMode = false;            document.getElementById('reviewActions').style.display = 'none';            switchScreen('quizScreen');            renderQuestion();            startTimer();        }        function startTimer() {            clearInterval(timerInt);            timerInt = setInterval(() => {                timeLeft--;                let m = Math.floor(timeLeft / 60).toString().padStart(2, '0');                let s = (timeLeft % 60).toString().padStart(2, '0');                document.getElementById('timer').innerText = `Thời gian: ${m}:${s}`;                if (timeLeft <= 0) submitQuiz();            }, 1000);        }        function updateProgress() {            let answered = userAnswers.filter(a => a !== null).length;            // Tiến trình dựa trên số câu đã đi qua / đã làm            let prog = (answered / questions.length) * 100;            document.getElementById('progressBar').style.width = `${prog}%`;        }        function renderQuestion() {            const qData = questions[currentIdx];            document.getElementById('questionCounter').innerText = `Câu: ${currentIdx + 1}/${questions.length}`;            document.getElementById('questionText').innerText = qData.q;                        const optsContainer = document.getElementById('optionsContainer');            optsContainer.innerHTML = '';            qData.o.forEach((optText, index) => {                const optDiv = document.createElement('div');                optDiv.className = 'option';                optDiv.innerText = optText;                                if (userAnswers[currentIdx] === index) {                    optDiv.classList.add('selected');                }                if (isReviewMode) {                    optDiv.classList.add('disabled');                    if (index === qData.a) {                        optDiv.classList.add('correct');                    } else if (userAnswers[currentIdx] === index && index !== qData.a) {                        optDiv.classList.add('wrong');                    }                } else {                    optDiv.onclick = () => selectOption(index);                }                optsContainer.appendChild(optDiv);            });            // Buttons visibility            document.getElementById('btnPrev').style.visibility = currentIdx === 0 ? 'hidden' : 'visible';                        if (currentIdx === questions.length - 1) {                document.getElementById('btnNext').style.display = 'none';                if(!isReviewMode) document.getElementById('btnSubmit').style.display = 'block';            } else {                document.getElementById('btnNext').style.display = 'block';                document.getElementById('btnSubmit').style.display = 'none';            }            if(isReviewMode) showReviewPopup(qData);        }        function selectOption(index) {            if (isReviewMode) return;            userAnswers[currentIdx] = index;            updateProgress();            renderQuestion();        }        function navQuestion(dir) {            currentIdx += dir;            renderQuestion();            if(!isReviewMode) updateProgress();        }        function submitQuiz() {            clearInterval(timerInt);            let correctCount = 0;            userAnswers.forEach((ans, i) => {                if (ans === questions[i].a) correctCount++;            });            let percent = Math.round((correctCount / questions.length) * 100);                        document.getElementById('scoreText').innerText = `${percent}%`;            document.getElementById('correctCountText').innerText = `Đúng: ${correctCount}/${questions.length}`;                        let circ = document.getElementById('circularProgress');            circ.style.background = `conic-gradient(#000 ${percent * 3.6}deg, rgba(0,0,0,0.1) 0deg)`;            switchScreen('resultScreen');        }        function startReview() {            isReviewMode = true;            currentIdx = 0;            document.getElementById('timer').innerText = "Chế độ Review";            document.getElementById('reviewActions').style.display = 'block';            document.getElementById('btnSubmit').style.display = 'none';            switchScreen('quizScreen');            renderQuestion();            updateProgress(); // Cập nhật full thanh tiến trình        }        function showReviewPopup(qData) {            clearTimeout(popupTimeout);            const popup = document.getElementById('reviewPopup');            const icon = document.getElementById('popupIcon');            const text = document.getElementById('popupText');                        let userAns = userAnswers[currentIdx];                        if (userAns === null) {                icon.innerHTML = '<span class="icon-cross">✗</span>';                text.innerText = "Bạn đã bỏ trống câu này.";            } else if (userAns === qData.a) {                icon.innerHTML = '<span class="icon-check">✓</span>';                text.innerText = "Chính xác! Bạn đã chọn đúng.";            } else {                icon.innerHTML = '<span class="icon-cross">✗</span>';                text.innerText = "Sai rồi! Đáp án đúng là mục được tô màu xanh.";            }            popup.classList.add('show');            popupTimeout = setTimeout(() => {                popup.classList.remove('show');            }, 10000);        }        function closePopup() {            document.getElementById('reviewPopup').classList.remove('show');        }        function resetSystem() {            closePopup();            switchScreen('startScreen');        }    </script></body></html>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ôn Tập Công Nghệ 9 - Pro Interface</title>
+    <style>
+        /* CSS Variables & Reset */
+        :root {
+            --light-bg: linear-gradient(135deg, #00FFFF, #FFFFE0);
+            --dark-bg: linear-gradient(135deg, #001F3F, #005C99); /* Dark blue, no purple */
+            --glass-bg: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+            --text-color: #000000; /* Strict black font */
+            --primary: #007BFF;
+            --success: #28a745;
+            --danger: #dc3545;
+            --grid-color-light: rgba(0, 0, 0, 0.05);
+            --grid-color-dark: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text-color);
+        }
+
+        body {
+            background: var(--light-bg);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            transition: background 0.5s ease;
+        }
+
+        body.dark-mode {
+            background: var(--dark-bg);
+        }
+
+        /* Moving Grid Canvas */
+        #bgCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+            z-index: 10;
+        }
+
+        .btn {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            padding: 10px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Container & Glassmorphism */
+        .container {
+            width: 90%;
+            max-width: 800px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: var(--glass-shadow);
+            position: relative;
+            z-index: 1;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .container.size-normal { max-width: 800px; }
+        .container.size-large { max-width: 1200px; }
+        .container.size-full { width: 100vw; height: 100vh; border-radius: 0; max-width: none; }
+
+        /* Screens */
+        .screen { display: none; opacity: 0; transition: opacity 0.4s ease; }
+        .screen.active { display: block; opacity: 1; }
+
+        /* Typography */
+        h1, h2, h3 { text-align: center; margin-bottom: 20px; }
+        
+        /* Setup Screen */
+        .setup-options { display: flex; flex-direction: column; gap: 15px; margin-bottom: 30px; }
+        .radio-group { display: flex; gap: 10px; align-items: center; justify-content: center; }
+        .radio-group label { cursor: pointer; font-size: 1.1rem; font-weight: 500; }
+
+        /* Quiz UI */
+        .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; font-weight: bold; font-size: 1.2rem; }
+        .progress-container { width: 100%; height: 8px; background: rgba(0,0,0,0.1); border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+        .progress-bar { height: 100%; background: #005C99; width: 0%; transition: width 0.5s ease; }
+        
+        .question-text { font-size: 1.3rem; font-weight: 600; margin-bottom: 20px; line-height: 1.5; }
+        
+        .options-grid { display: flex; flex-direction: column; gap: 12px; }
+        .option {
+            background: rgba(255,255,255,0.6);
+            border: 2px solid rgba(0,0,0,0.1);
+            padding: 15px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease; /* No nasty reloads, just smooth background/border tween */
+        }
+        .option:hover { background: rgba(255,255,255,0.9); }
+        .option.selected { background: #e0f0ff; border-color: #007BFF; font-weight: bold; }
+        .option.correct { background: #d4edda; border-color: #28a745; }
+        .option.incorrect { background: #f8d7da; border-color: #dc3545; }
+
+        .navigation { display: flex; justify-content: space-between; margin-top: 30px; }
+
+        /* Result Circular Progress */
+        .result-circle {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 30px;
+        }
+        .result-circle svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .circle-bg { fill: none; stroke: rgba(0,0,0,0.1); stroke-width: 15; }
+        .circle-progress {
+            fill: none; stroke: #005C99; stroke-width: 15;
+            stroke-dasharray: 565; stroke-dashoffset: 565;
+            transition: stroke-dashoffset 1.5s ease-out;
+        }
+        .score-text {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 2rem; font-weight: bold; text-align: center;
+        }
+
+        /* Toast Popup */
+        .toast {
+            position: fixed; bottom: -100px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--glass-border);
+            padding: 15px 20px; border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            display: flex; align-items: center; gap: 15px;
+            transition: bottom 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+        }
+        .toast.show { bottom: 30px; }
+        .toast-icon { font-size: 1.5rem; }
+        .toast-content { font-size: 1rem; font-weight: bold; }
+        .toast-close { cursor: pointer; font-weight: bold; font-size: 1.2rem; margin-left: 10px; }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container { width: 95%; padding: 20px; }
+            .question-text { font-size: 1.1rem; }
+            .option { font-size: 1rem; }
+            .top-bar { top: 10px; right: 10px; }
+            .btn { padding: 8px 15px; }
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="bgCanvas"></canvas>
+
+    <div class="top-bar">
+        <button class="btn" id="themeToggleBtn">Sáng / Tối</button>
+    </div>
+
+    <div class="container" id="mainContainer">
+        
+        <div id="setupScreen" class="screen active">
+            <h1>HỆ THỐNG TRẮC NGHIỆM PRO</h1>
+            <h2>Môn: Công Nghệ 9</h2>
+            <div class="setup-options">
+                <h3>Chọn kích thước cửa sổ:</h3>
+                <div class="radio-group">
+                    <input type="radio" id="sizeNormal" name="windowSize" value="normal" checked>
+                    <label for="sizeNormal">Normal</label>
+                </div>
+                <div class="radio-group">
+                    <input type="radio" id="sizeLarge" name="windowSize" value="large">
+                    <label for="sizeLarge">Large</label>
+                </div>
+                <div class="radio-group">
+                    <input type="radio" id="sizeFull" name="windowSize" value="full">
+                    <label for="sizeFull">Full-Screen</label>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <button class="btn" style="font-size: 1.2rem; padding: 15px 40px;" onclick="app.startQuiz()">BẮT ĐẦU</button>
+            </div>
+        </div>
+
+        <div id="quizScreen" class="screen">
+            <div class="quiz-header">
+                <div id="questionCount">Câu: 1/28</div>
+                <div id="timer">Thời gian: 15:00</div>
+            </div>
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="question-text" id="questionText">Loading...</div>
+            <div class="options-grid" id="optionsGrid">
+                </div>
+            <div class="navigation">
+                <button class="btn" id="prevBtn" onclick="app.prevQuestion()">Quay lại</button>
+                <button class="btn" id="nextBtn" onclick="app.nextQuestion()">Tiếp theo</button>
+                <button class="btn" id="submitBtn" onclick="app.submitQuiz()" style="display: none; background: #005C99; color: white;">Nộp Bài</button>
+            </div>
+        </div>
+
+        <div id="resultScreen" class="screen">
+            <h1>KẾT QUẢ BÀI LÀM</h1>
+            <div class="result-circle">
+                <svg>
+                    <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
+                    <circle class="circle-progress" id="circleProgress" cx="100" cy="100" r="90"></circle>
+                </svg>
+                <div class="score-text">
+                    <div id="scoreRatio">0/28</div>
+                    <div id="scorePercent" style="font-size: 1rem;">0%</div>
+                </div>
+            </div>
+            <div style="text-align: center; display: flex; gap: 15px; justify-content: center;">
+                <button class="btn" onclick="app.startReview()">Xem Lại Bài</button>
+                <button class="btn" onclick="location.reload()">Làm Lại</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <div class="toast-icon" id="toastIcon">✔️</div>
+        <div class="toast-content" id="toastText">Đáp án chính xác!</div>
+        <div class="toast-close" onclick="app.closeToast()">✕</div>
+    </div>
+
+    <script>
+        // Data Source
+        const rawData = [
+            { q: "Câu 1: Tên gọi khác của thịt thăn là ................................................................", o: ["A. Thịt nạc vai.", "B. Thịt ba rọi.", "C. Thịt ba chỉ.", "D. Thịt nạc thăn."], a: 3 },
+            { q: "Câu 2: Chất khoáng Iodine thường có nhiều trong thực phẩm:", o: ["A. Thịt bò, rau mồng tơi", "B. Rau dền, tôm.", "C. Cua, ghẹ, nghêu, sò, hến.", "D. Rau bắp cải, cá mực."], a: 3 },
+            { q: "Câu 3: Công việc chính của đầu bếp trưởng là ................................................................", o: ["A. Nhận đơn hàng của khách hàng...", "B. Bảo quản thực phẩm chưa sử dụng...", "C. Lập kế hoạch, phát triển các công thức nấu ăn...", "D. Trộn, nghiền, tách thực phẩm..."], a: 2 },
+            { q: "Câu 4: Nội dung nào sau đây đúng khi trang bị bảo hộ cần thiết để đảm bảo an toàn lao động...", o: ["A. Tạp dề, khẩu trang, mũ đội che tóc,...", "B. Nguyên liệu, khẩu trang, tạp dề,...", "C. Khay làm bánh, nhà bếp, tạp dề,...", "D. Tạp dề, găng tay, bồn rửa,..."], a: 0 },
+            { q: "Câu 5: Để thực hiện tốt công việc của một thợ chế biến thực phẩm cần phải chú trọng...", o: ["A. Kĩ năng chế biến các loại thực phẩm.", "B. Kĩ năng vận hành máy móc.", "C. Kĩ năng quản lí đầu bếp và nhân viên.", "D. Kĩ năng giám sát máy sản xuất thực phẩm."], a: 0 },
+            { q: "Câu 6: Nội dung nào dưới đây đúng khi nói về lưu ý khi sử dụng loại dụng cụ, thiết bị được làm từ nhựa?", o: ["A. Nên dùng để đựng thức ăn đang sôi...", "B. Hạn chế sử dụng các chất tẩy rửa mạnh...", "C. Có thể đặt gần bếp lửa...", "D. Không cần kiểm tra đồ nhựa..."], a: 1 },
+            { q: "Câu 7: Yêu cầu khi sử dụng các dụng cụ sắc nhọn trong nhà bếp:", o: ["A. Không sử dụng các dụng cụ sắc nhọn bị hư hỏng.", "B. Bố trí hợp lí, thuận tiện sử dụng, để xa tầm tay trẻ em.", "C. Để gần tầm tay trẻ em.", "D. Để ở những nơi thông thoáng."], a: 1 },
+            { q: "Câu 8: Lưu ý khi sử dụng và bảo quản thiết bị dùng gas là ................................................................", o: ["A. Đặt bình gas gần nguồn nhiệt...", "B. Sử dụng thiết bị gas trong phòng kín...", "C. Khóa van gas sau khi sử dụng", "D. Để bình gas nằm ngang..."], a: 2 },
+            { q: "Câu 9: Bạn Hùng bị táo bón, bác sĩ khuyên nên tăng cường ăn rau xanh... Thành phần nào giúp cải thiện?", o: ["A. Lipid", "B. Chất xơ", "C. Protein", "D. Vitamin"], a: 1 },
+            { q: "Câu 10: 1kg bắp cải có đơn giá ước tính 30.000 đồng. Vậy chi phí mua 0,5kg bắp cải là bao nhiêu?", o: ["A. 12.000 đồng.", "B. 15.000 đồng.", "C. 20.000 đồng.", "D. 25.000 đồng."], a: 1 },
+            { q: "Câu 11: Vai trò của vitamin A đối với cơ thể con người?", o: ["A. Tham gia quá trình oxy hóa...", "B. Kích thích ăn uống...", "C. Tăng cường quá trình cốt hóa xương.", "D. Phát triển, tái tạo các tế bào da, niêm mạc và tăng cường miễn dịch."], a: 3 },
+            { q: "Câu 12: Chất khoáng sắt thường có trong các loại thực phẩm nào?", o: ["A. Rau lá màu xanh đậm.", "B. Muối, các loại gia vị.", "C. Các loại thịt, hải sản...", "D. Gan, thịt động vật bốn chân và trứng."], a: 0 },
+            { q: "Câu 13: Thiếu Iodine có thể dẫn đến nguy cơ mắc các bệnh:", o: ["A. Buồn nôn, đau bụng, tiêu chảy.", "B. Suy giáp - bệnh bướu cổ.", "C. Da đậm màu, màu đồng...", "D. Khát nước, chướng bụng..."], a: 1 },
+            { q: "Câu 14: Đặc điểm của thịt lợn tươi ngon?", o: ["A. Có màu trắng, săn chắc...", "B. Có màu hồng, thịt nhão...", "C. Có màu hồng, săn chắc, da mỏng, không có mùi ôi thiu và mùi thuốc kháng sinh.", "D. Có màu hồng, săn chắc, da mỏng."], a: 2 },
+            { q: "Câu 15: Tên gọi khác của thịt ba chỉ là:", o: ["A. Thịt nạc vai.", "B. Thịt thăn.", "C. Thịt ba rọi.", "D. Thịt mông."], a: 2 },
+            { q: "Câu 16: Nhiệt độ nguy hiểm khiến vi khuẩn phát triển nhanh nhất trong thực phẩm là:", o: ["A. 0°C đến 37°C.", "B. Dưới 0°C.", "C. Trên 100°C.", "D. 70°C đến 80°C."], a: 0 },
+            { q: "Câu 17: Một số ngành nghề liên quan đến chế biến thực phẩm là", o: ["A. Thợ chế biến thực phẩm, thợ cơ khí...", "B. Thợ chế biến thực phẩm, thợ vận hành máy sản xuất thực phẩm, đầu bếp trưởng...", "C. Thợ chế biến thực phẩm, tiếp viên hàng không...", "D. Thợ chế biến thực phẩm, giáo viên..."], a: 1 },
+            { q: "Câu 18: Nội dung nào dưới đây không đúng khi nói về công việc chính của người chuẩn bị đồ ăn nhanh?", o: ["A. Chuẩn bị món ăn, đồ uống đơn giản...", "B. Rửa, thái, đong và trộn thực phẩm...", "C. Sử dụng thiết bị nấu ăn...", "D. Giám sát máy móc dùng để giết mổ động vật, cắt thịt..."], a: 3 },
+            { q: "Câu 19: Tại sao không nên phơi các dụng cụ, thiết bị làm từ nhựa trực tiếp dưới ánh sáng mặt trời?", o: ["A. Nhanh bị móp, méo.", "B. Nhanh bị giòn, vỡ, gãy.", "C. Không gây tác hại nào.", "D. Dễ bị mốc, mọt."], a: 1 },
+            { q: "Câu 20: Cách sử dụng loại dụng cụ, thiết bị được làm từ gỗ?", o: ["A. Không đun nấu, đựng đồ ở nhiệt độ quá cao.", "B. Hạn chế va đập...", "C. Tránh tiếp xúc trực tiếp với lửa hoặc nguồn nhiệt có nhiệt độ quá cao.", "D. Phơi trực tiếp dưới ánh sáng mặt trời..."], a: 2 },
+            { q: "Câu 21: Biện pháp giúp phòng tránh ngộ độc thực phẩm do vi sinh vật là", o: ["A. Đeo khẩu trang khi đi ngủ.", "B. Ăn tiết canh, nem chua thường xuyên.", "C. Rửa tay bằng xà phòng trước khi chế biến.", "D. Sử dụng thực phẩm đã hết hạn sử dụng."], a: 2 },
+            { q: "Câu 22: Bỏ bữa sáng dẫn đến thiếu thành phần dinh dưỡng chính nào để cung cấp năng lượng tức thời?", o: ["A. Protein", "B. Lipid", "C. Carbohydrate (Chất bột đường)", "D. Vitamin"], a: 2 },
+            { q: "Câu 23: 0,5kg quả bí đỏ 10.000 đồng. Vậy 1kg quả bí đỏ bao nhiêu tiền?", o: ["A. 15.000 đồng.", "B. 20.000 đồng", "C. 25.000 đồng.", "D. 30.000 đồng"], a: 1 },
+            { q: "Câu 24: Vai trò của vitamin C đối với cơ thể con người?", o: ["A. Giúp phát triển, tái tạo tế bào...", "B. Kích thích phát triển hệ xương.", "C. Góp phần phát triển hệ thần kinh.", "D. Chống oxy hóa, kích thích liền sẹo, dự phòng bệnh tim mạch."], a: 3 },
+            { q: "Câu 25: Vitamin A thường có trong loại thực phẩm nào?", o: ["A. Sữa, gan, lòng đỏ trứng, bơ, phô mai.", "B. Các loại ngũ cốc, rau, củ...", "C. Các loại quả: chanh, cam, bưởi...", "D. Hải sản."], a: 0 },
+            { q: "Câu 26: Thiếu vitamin A có thể dẫn đến nguy cơ mắc các bệnh:", o: ["A. Thiếu máu.", "B. Còi xương, loãng xương.", "C. Quáng gà, khô mắt.", "D. Bệnh bướu cổ."], a: 2 },
+            { q: "Câu 27: Đặc điểm của gạo tẻ ngon:", o: ["A. Hạt ít rạn nứt, rắn chắc.", "B. Có màu hơi trắng đục, thân hạt hơi dài, hình bầu dục.", "C. Hạt tròn suôn hai đầu...", "D. Hạt gạo không nát, có mùi thơm đặc trưng."], a: 1 },
+            { q: "Câu 28: Để phòng chống bệnh còi xương ở trẻ em, cần bổ sung:", o: ["A. Vitamin A", "B. Vitamin C", "C. Vitamin B1", "D. Vitamin D"], a: 3 }
+        ];
+
+        const app = {
+            questions: [],
+            answers: new Array(rawData.length).fill(null),
+            currentIndex: 0,
+            timeLeft: 15 * 60,
+            timerInterval: null,
+            isReviewMode: false,
+            toastTimeout: null,
+
+            init() {
+                // Shuffle logic
+                this.questions = [...rawData].sort(() => Math.random() - 0.5);
+                this.bindThemeToggle();
+                this.initBackgroundGrid();
+            },
+
+            startQuiz() {
+                // Window Size Handle
+                const size = document.querySelector('input[name="windowSize"]:checked').value;
+                const container = document.getElementById('mainContainer');
+                container.className = 'container'; // reset
+                
+                if (size === 'large') container.classList.add('size-large');
+                if (size === 'full') {
+                    container.classList.add('size-full');
+                    if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen().catch(e => console.log(e));
+                    }
+                } else {
+                    container.classList.add('size-normal');
+                    if(document.fullscreenElement) document.exitFullscreen();
+                }
+
+                this.switchScreen('setupScreen', 'quizScreen');
+                this.startTimer();
+                this.renderQuestion();
+            },
+
+            startTimer() {
+                this.timerInterval = setInterval(() => {
+                    this.timeLeft--;
+                    const m = Math.floor(this.timeLeft / 60).toString().padStart(2, '0');
+                    const s = (this.timeLeft % 60).toString().padStart(2, '0');
+                    document.getElementById('timer').innerText = `Thời gian: ${m}:${s}`;
+                    if (this.timeLeft <= 0) {
+                        clearInterval(this.timerInterval);
+                        this.submitQuiz();
+                    }
+                }, 1000);
+            },
+
+            renderQuestion() {
+                const q = this.questions[this.currentIndex];
+                document.getElementById('questionCount').innerText = `Câu: ${this.currentIndex + 1}/${this.questions.length}`;
+                document.getElementById('questionText').innerText = q.q;
+
+                const optionsGrid = document.getElementById('optionsGrid');
+                optionsGrid.innerHTML = ''; // Clear old
+
+                q.o.forEach((optText, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'option';
+                    div.innerText = optText;
+
+                    // Restore Selection State without reloading animation
+                    if (this.answers[this.currentIndex] === index) {
+                        div.classList.add('selected');
+                    }
+
+                    if (this.isReviewMode) {
+                        div.style.cursor = 'default';
+                        // Reveal logic
+                        if (index === q.a) {
+                            div.classList.add('correct');
+                        } else if (this.answers[this.currentIndex] === index) {
+                            div.classList.add('incorrect');
+                        }
+                    } else {
+                        div.onclick = () => this.selectOption(index, div);
+                    }
+
+                    optionsGrid.appendChild(div);
+                });
+
+                this.updateNavButtons();
+                
+                // Progress bar logic: only increase based on max index reached or answered count
+                const progress = ((this.currentIndex) / this.questions.length) * 100;
+                document.getElementById('progressBar').style.width = `${progress}%`;
+
+                if (this.isReviewMode) this.showReviewPopup(q);
+            },
+
+            selectOption(index, element) {
+                if (this.isReviewMode) return;
+                this.answers[this.currentIndex] = index;
+                // Soft UI update, no reload animation
+                const opts = document.querySelectorAll('.option');
+                opts.forEach(o => o.classList.remove('selected'));
+                element.classList.add('selected');
+            },
+
+            nextQuestion() {
+                if (this.currentIndex < this.questions.length - 1) {
+                    this.currentIndex++;
+                    this.renderQuestion();
+                }
+            },
+
+            prevQuestion() {
+                if (this.currentIndex > 0) {
+                    this.currentIndex--;
+                    this.renderQuestion();
+                }
+            },
+
+            updateNavButtons() {
+                document.getElementById('prevBtn').style.visibility = this.currentIndex === 0 ? 'hidden' : 'visible';
+                
+                if (this.currentIndex === this.questions.length - 1) {
+                    document.getElementById('nextBtn').style.display = 'none';
+                    if (!this.isReviewMode) document.getElementById('submitBtn').style.display = 'block';
+                } else {
+                    document.getElementById('nextBtn').style.display = 'block';
+                    document.getElementById('submitBtn').style.display = 'none';
+                }
+            },
+
+            submitQuiz() {
+                clearInterval(this.timerInterval);
+                let score = 0;
+                this.answers.forEach((ans, idx) => {
+                    if (ans === this.questions[idx].a) score++;
+                });
+
+                const percent = Math.round((score / this.questions.length) * 100);
+                document.getElementById('scoreRatio').innerText = `${score}/${this.questions.length}`;
+                document.getElementById('scorePercent').innerText = `${percent}%`;
+
+                // Calculate SVG dash offset
+                const circle = document.getElementById('circleProgress');
+                const offset = 565 - (565 * percent) / 100;
+                
+                this.switchScreen('quizScreen', 'resultScreen');
+                
+                setTimeout(() => {
+                    circle.style.strokeDashoffset = offset;
+                }, 100); // slight delay for animation trigger
+            },
+
+            startReview() {
+                this.isReviewMode = true;
+                this.currentIndex = 0;
+                document.getElementById('timer').style.display = 'none';
+                document.getElementById('submitBtn').style.display = 'none';
+                this.switchScreen('resultScreen', 'quizScreen');
+                
+                // Thêm nút Làm lại bài vào header khi xem lại
+                if(!document.getElementById('retryReviewBtn')) {
+                    const btn = document.createElement('button');
+                    btn.id = 'retryReviewBtn';
+                    btn.className = 'btn';
+                    btn.innerText = 'Làm Lại Bài';
+                    btn.onclick = () => location.reload();
+                    document.querySelector('.quiz-header').appendChild(btn);
+                }
+
+                this.renderQuestion();
+            },
+
+            showReviewPopup(q) {
+                const userAns = this.answers[this.currentIndex];
+                const isCorrect = userAns === q.a;
+                const isUnanswered = userAns === null;
+
+                const icon = document.getElementById('toastIcon');
+                const text = document.getElementById('toastText');
+                
+                if (isUnanswered) {
+                    icon.innerText = '⚠️';
+                    icon.style.color = '#ffc107';
+                    text.innerText = 'Bạn chưa trả lời câu này.';
+                } else if (isCorrect) {
+                    icon.innerText = '✔️';
+                    icon.style.color = 'var(--success)';
+                    text.innerText = 'Chính xác! Bạn đã chọn đúng.';
+                } else {
+                    icon.innerText = '❌';
+                    icon.style.color = 'var(--danger)';
+                    text.innerText = 'Sai rồi! Hãy xem đáp án đúng màu xanh.';
+                }
+
+                const toast = document.getElementById('toast');
+                toast.classList.add('show');
+
+                clearTimeout(this.toastTimeout);
+                this.toastTimeout = setTimeout(() => {
+                    this.closeToast();
+                }, 10000); // Tự tắt sau 10s
+            },
+
+            closeToast() {
+                document.getElementById('toast').classList.remove('show');
+            },
+
+            switchScreen(hideId, showId) {
+                const hideEl = document.getElementById(hideId);
+                const showEl = document.getElementById(showId);
+                hideEl.classList.remove('active');
+                setTimeout(() => {
+                    showEl.classList.add('active');
+                }, 400); // sync with opacity transition
+            },
+
+            bindThemeToggle() {
+                const btn = document.getElementById('themeToggleBtn');
+                btn.onclick = () => {
+                    document.body.classList.toggle('dark-mode');
+                };
+            },
+
+            initBackgroundGrid() {
+                const canvas = document.getElementById('bgCanvas');
+                const ctx = canvas.getContext('2d');
+                let w, h;
+                let offset = 0;
+                const gridSize = 50;
+
+                const resize = () => {
+                    w = canvas.width = window.innerWidth;
+                    h = canvas.height = window.innerHeight;
+                };
+                window.addEventListener('resize', resize);
+                resize();
+
+                const draw = () => {
+                    ctx.clearRect(0, 0, w, h);
+                    const isDark = document.body.classList.contains('dark-mode');
+                    ctx.strokeStyle = isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.05)';
+                    ctx.lineWidth = 1;
+
+                    ctx.beginPath();
+                    // Vertical lines
+                    for (let x = (offset % gridSize); x < w; x += gridSize) {
+                        ctx.moveTo(x, 0);
+                        ctx.lineTo(x, h);
+                    }
+                    // Horizontal lines
+                    for (let y = (offset % gridSize); y < h; y += gridSize) {
+                        ctx.moveTo(0, y);
+                        ctx.lineTo(w, y);
+                    }
+                    ctx.stroke();
+
+                    offset += 0.5; // Medium-fast tween speed
+                    requestAnimationFrame(draw);
+                };
+                draw();
+            }
+        };
+
+        // Boot
+        window.onload = () => app.init();
+    </script>
+</body>
+</html>
